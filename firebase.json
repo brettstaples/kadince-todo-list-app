@@ -1,0 +1,22 @@
+{
+  "hosting": {
+    "public": "dist",
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": "api"
+      }
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "*.py",
+      "*.log"
+    ]
+  },
+  "functions": {
+    "source": ".",
+    "runtime": "nodejs18"
+  }
+}
