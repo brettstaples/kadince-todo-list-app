@@ -15,6 +15,8 @@ const { Client } = pg;
 const client = new Client({
     connectionString: process.env.CONNECTION_STRING,
 });
+const inProgress = "in progress";
+const finished = "finished";
 
 await client.connect();
 const db = drizzle(client);
@@ -27,21 +29,19 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/api/select/all/tasks", async (req, res) => {
-    const result = await db.select().from(tasks);
+    const result = await db.select()
+                                             .from(tasks);
     res.send(result);
 });
 
 app.post("/api/create/task", async (req, res) => {
     if (req.body.name !== "") {
-        let deadlineDate;
-        if (req.body.deadline !== null) {
-            deadlineDate = new Date(req.body.deadline);
-        } else {
-            deadlineDate = req.body.deadline;
-        }
-
+        const deadlineDate = (req.body.deadline !== null) ? new Date(req.body.deadline) : req.body.deadline;
         await db.insert(tasks)
-                .values({ name: req.body.name, status: "in progress", deadline: deadlineDate, showDeadline: true });
+                .values({ name: req.body.name,
+                                status: "in progress",
+                                deadline: deadlineDate,
+                                showDeadline: true });
         res.sendStatus(200);
     } else {
         res.sendStatus(400);
@@ -49,15 +49,20 @@ app.post("/api/create/task", async (req, res) => {
 });
 
 app.post("/api/delete/task", async (req, res) => {
-    await db.delete(tasks).where(eq(tasks.id, req.body.id));
+    await db.delete(tasks)
+            .where(eq(tasks.id, req.body.id));
     res.sendStatus(200);
 });
 
 app.post("/api/update/task", async (req, res) => {
     if (req.body.name !== "") {
-        let deadlineDate = (req.body.deadline !== null) ? new Date(req.body.deadline) : req.body.deadline;
+        const deadlineDate = (req.body.deadline !== null) ? new Date(req.body.deadline) : req.body.deadline;
+        const statusBoolean = (req.body.status === inProgress);
         await db.update(tasks)
-                .set({ name: req.body.name, deadline: deadlineDate, showDeadline: true }).where(eq(tasks.id, req.body.id));
+                .set({ name: req.body.name,
+                       deadline: deadlineDate,
+                       showDeadline: statusBoolean})
+                .where(eq(tasks.id, req.body.id));
         res.sendStatus(200);
     } else {
         res.sendStatus(400);
@@ -65,18 +70,18 @@ app.post("/api/update/task", async (req, res) => {
 });
 
 app.post("/api/change/task/status", async (req, res) => {
-    let value;
+    let statusStr;
     let showDeadlineBoolean;
-    if (req.body.status === "in progress") {
-        value = "finished";
+    if (req.body.status === inProgress) {
+        statusStr = finished;
         showDeadlineBoolean = false;
     } else {
-        value = "in progress";
+        statusStr = inProgress;
         showDeadlineBoolean = true;
     }
 
     await db.update(tasks)
-            .set({ status: value, showDeadline: showDeadlineBoolean })
+            .set({ status: statusStr, showDeadline: showDeadlineBoolean })
             .where(eq(tasks.id, req.body.id));
     res.sendStatus(200);
 });

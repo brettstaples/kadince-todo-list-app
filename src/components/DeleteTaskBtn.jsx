@@ -1,6 +1,7 @@
-import * as constants from "../development_variables.js";
-export default function DeleteTaskBtn({id, filterRef, fetchTasks, whichTaskEditRef}) {
+import * as constants from "../Constants.js";
+export default function DeleteTaskBtn({ id, filterRef, fetchTasks, setLoading }) {
     async function deleteTask(id) {
+        setLoading(true)
         await fetch(`${constants.hostingUrl}/api/delete/task`, {
             method: "POST",
             headers: {
@@ -11,9 +12,13 @@ export default function DeleteTaskBtn({id, filterRef, fetchTasks, whichTaskEditR
             })
         });
 
-        whichTaskEditRef.current = -1;
         fetchTasks(filterRef.current);
     }
 
-    return <button  onClick={() => deleteTask(id)}>Delete</button>;
+    return (
+        <div>
+            <button className="delete is-large is-background-dark"
+                    onClick={() => deleteTask(id)}></button>
+        </div>
+    );
 }

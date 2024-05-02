@@ -14,16 +14,21 @@
     "preview": "vite preview",
     "generate": "drizzle-kit generate:pg --config=./drizzle.config.js",
     "migration:push": "drizzle-kit push:pg --config=./drizzle.config.js",
-    "migrate": "drizzle-kit generate:pg --config=./drizzle.config.js && drizzle-kit push:pg --config=./drizzle.config.js"
+    "migrate": "drizzle-kit generate:pg --config=./drizzle.config.js && drizzle-kit push:pg --config=./drizzle.config.js",
+    "bulma": "sass --load-path=node_modules src/css:src/css"
   },
   "dependencies": {
+    "bulma": "^1.0.0",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.9",
     "express": "^4.19.2",
     "firebase-functions": "^4.9.0",
     "pg": "^8.11.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-loader-spinner": "^6.1.6",
+    "react-spinners": "^0.13.8",
+    "sass": "^1.75.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

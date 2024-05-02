@@ -1,4 +1,5 @@
-import * as constants from "../development_variables.js"
+import * as constants from "../Constants.js"
+
 export default function ChangeTaskProgressBtn({id, status, filterRef, fetchTasks, value, showDeadlineBoolean}) {
     async function changeProgress(id, status) {
         await fetch(`${constants.hostingUrl}/api/change/task/status`, {
@@ -16,5 +17,9 @@ export default function ChangeTaskProgressBtn({id, status, filterRef, fetchTasks
         fetchTasks(filterRef.current);
     }
 
-    return <button onClick={() => changeProgress(id, status)}>{value}</button>;
+    return (
+        <div>
+            <button className="button px-3 py-2 is-small is-warning is-dark" onClick={() => changeProgress(id, status)}>{value}</button>
+        </div>
+    );
 }

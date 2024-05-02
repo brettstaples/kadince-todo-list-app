@@ -1,8 +1,13 @@
-export default function EditTaskbutton({id, whichTaskEditRef, fetchTasks, filterRef}) {
+export default function EditTaskbtn({ id, setTaskEditId, taskEditId }) {
     async function addEditInput(id) {
-        whichTaskEditRef.current = id;
-        fetchTasks(filterRef.current);
+        const newSet = taskEditId;
+        newSet.add(id);
+        setTaskEditId(newSet);
     }
 
-    return <button onClick={() => addEditInput(id)}>Edit</button>;
+    return (
+        <div>
+            <button className="button px-4 py-2 is-small is-primary is-dark" onClick={() => addEditInput(id)}>Edit</button>
+        </div>
+    );
 }

@@ -1,15 +1,23 @@
-export default function ExitTaskBtn({ whichExit, fetchTasks, filter }) {
-    function handleClick(filter) {
-        if (whichExit.current.toString() !== "true") {
-            whichExit.current = -1;
+export default function ExitTaskBtn({ whichExitFunc, whichExitVal, setInputDate, id }) {
+    function handleClick() {
+        if (whichExitVal.toString() !== "true") {
+            const newSet = whichExitVal;
+            newSet.delete(id);
+            whichExitFunc(newSet);
         } else {
-            whichExit.current = false;
+            whichExitFunc(false);
         }
 
-        fetchTasks(filter);
+        if (setInputDate !== undefined) {
+            setInputDate(null);
+        }
+
     }
 
     return (
-        <button type="button" onClick={() => handleClick(filter)}>Exit</button>
-    )
+            <div className="is-flex is-flex-direction-column is-justify-content-center is-align-items-center">
+                <button type="button" className="delete is-large is-background-dark"
+                        onClick={() => handleClick()}></button>
+            </div>
+        )
 }

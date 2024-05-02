@@ -1,28 +1,27 @@
-import * as constants from "../development_variables.js"
-import { useRef, useState } from "react";
+import * as constants from "../Constants.js"
+import { useState } from "react";
 import InputDateForm from "./InputDateForm.jsx";
-import ExitTaskBtn from "./ExitTaskBtn";
 
-export default function CreateTaskForm({fetchTasks, filterRef}) {
+export default function CreateTaskForm({ fetchTasks, filterRef, setLoading }) {
     const [inputName, setNameInput] = useState("");
-    const [inputDate, setDateInput] = useState(undefined);
-    const inputDateRef = useRef(false);
+    const [inputDate, setInputDate] = useState(undefined);
+    const [showInputDate, setShowInputDate] = useState(false);
 
     function showDateInput() {
-        inputDateRef.current = true;
-        fetchTasks(filterRef.current);
+        setShowInputDate(true);
     }
 
     const createNewTask = async (e) => {
         e.preventDefault();
-        let inputNameFormatted = inputName.trim();
+        const inputNameFormatted = inputName.trim();
 
-        if (!inputNameFormatted || (inputDateRef.current && inputDate === undefined)) {
+        if (!inputNameFormatted || (showInputDate && inputDate === undefined)) {
             return;
         }
 
         setNameInput("");
-        const dateInput = (inputDateRef.current) ? inputDate : null;
+        setLoading(true);
+        const dateInput = showInputDate ? inputDate : null;
         await fetch(`${constants.hostingUrl}/api/create/task`, {
             method: "POST",
             headers: {
@@ -31,32 +30,47 @@ export default function CreateTaskForm({fetchTasks, filterRef}) {
             body: JSON.stringify({
                 name: inputNameFormatted,
                 deadline: dateInput,
-            })
+            }),
         });
 
-        inputDateRef.current = false;
-        setDateInput(null);
+        setShowInputDate(false);
+        setInputDate(null);
         fetchTasks(filterRef.current);
     }
 
     return (
-        <form onSubmit={createNewTask}>
-            <input
-                maxLength="255"
-                type="text"
-                placeholder="Ex. Do Math"
-                value={inputName}
-                onChange={(e) => {setNameInput(e.target.value)}} />
+        <form onSubmit={createNewTask} className="field">
             <div>
-                <p>Please input task name</p>
-                {inputDateRef.current ? (
-                    <div>
-                        <InputDateForm setDateInput={setDateInput}/>
-                        <ExitTaskBtn whichExit={inputDateRef} fetchTasks={fetchTasks} filter={filterRef.current} />
-                    </div>
-                ) : <button type="button" onClick={() => showDateInput()} >Set Deadline?</button>}
+                <div className="has-text-centered pr-1">
+                    <p className="title is-2 mb-1">Todo List</p>
+                </div>
+                <div className="control">
+                    <input
+                        className="input is-primary has-text-centered px-4"
+                        maxLength="255"
+                        type="text"
+                        placeholder="Ex. Do Math"
+                        value={inputName}
+                        onChange={(e) => setNameInput(e.target.value)}/>
+                </div>
+                <p className="help m-0 has-text-white">Please input task name</p>
             </div>
-            <button  type="submit">Input Task</button>
+            <div>
+                {
+                    showInputDate
+                        ? (
+                            <InputDateForm setInputDate={setInputDate} showInputDate={showInputDate} setShowInputDate={setShowInputDate} />
+                        )
+                        : (
+                            <div className="is-flex is-justify-content-center my-2">
+                                <button type="button" className="deadline button is-small is-rounded" onClick={() => showDateInput()}>Set Deadline?</button>
+                            </div>
+                        )
+                }
+            </div>
+            <div className="is-flex is-justify-content-center">
+                <button type="submit" className="button is-primary is-rounded is-dark mt-1 mb-1 is-normal">Input Task</button>
+            </div>
         </form>
-    )
+    );
 }
