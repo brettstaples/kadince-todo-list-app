@@ -41,7 +41,7 @@ app.post("/api/create/task", async (req, res) => {
                 .values({ name: req.body.name,
                                 status: "in progress",
                                 deadline: deadlineDate,
-                                showDeadline: true });
+                                showDates: true });
         res.sendStatus(200);
     } else {
         res.sendStatus(400);
@@ -61,7 +61,7 @@ app.post("/api/update/task", async (req, res) => {
         await db.update(tasks)
                 .set({ name: req.body.name,
                        deadline: deadlineDate,
-                       showDeadline: statusBoolean})
+                       showDates: statusBoolean})
                 .where(eq(tasks.id, req.body.id));
         res.sendStatus(200);
     } else {
@@ -71,24 +71,25 @@ app.post("/api/update/task", async (req, res) => {
 
 app.post("/api/change/task/status", async (req, res) => {
     let statusStr;
-    let showDeadlineBoolean;
+    let showDatesBoolean;
+    const isDateCompleted = (req.body.dateCompleted === null) ? null : new Date(req.body.dateCompleted);
     if (req.body.status === inProgress) {
         statusStr = finished;
-        showDeadlineBoolean = false;
+        showDatesBoolean = false;
     } else {
         statusStr = inProgress;
-        showDeadlineBoolean = true;
+        showDatesBoolean = true;
     }
 
     await db.update(tasks)
-            .set({ status: statusStr, showDeadline: showDeadlineBoolean })
+            .set({ status: statusStr, showDates: showDatesBoolean, dateCompleted: isDateCompleted })
             .where(eq(tasks.id, req.body.id));
     res.sendStatus(200);
 });
 
 app.post("/api/update/deadline", async (req, res) => {
     await db.update(tasks)
-            .set({ showDeadline: req.body.showDeadlineBoolean })
+            .set({ showDates: req.body.showDatesBoolean })
             .where(eq(tasks.id, req.body.id));
     res.sendStatus(200);
 });

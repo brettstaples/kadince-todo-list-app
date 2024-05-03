@@ -1,0 +1,1 @@
+ALTER TABLE "tasks" RENAME COLUMN "showDeadline" TO "showDates";

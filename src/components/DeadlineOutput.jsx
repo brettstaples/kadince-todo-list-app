@@ -1,31 +1,20 @@
-export default function DeadlineOutput({deadline, currentTime}) {
+export default function DeadlineOutput({ deadline }) {
     return (
         <div className="is-flex is-flex-direction-column is-justify-content-center is-align-items-center">
             {
-                (deadline === null)
-                    ? null
-                    : (currentTime >=deadline.getTime())
-                        ? (
-                            <div>
-                                <p className="has-text-danger">You FAILED!</p>
-                            </div>
-                        )
-                        : (
-                            <div>
-                                <p className="has-text-success">You Still Have time</p>
-                            </div>
-                        )
-            }
-            <div>
-                {
-                    (deadline !== null)
+                (deadline !== null)
                     && (
-                        <div>
-                            <p className="has-text-text mb-1">{deadline.toLocaleString()}</p>
+                        <div className="
+                                        is-flex
+                                        is-flex-direction-column
+                                        is-justify-content-center
+                                        is-align-items-center">
+                            <p className="help mt-1 mb-0"><u>Deadline</u></p>
+                            <p className="has-text-text"
+                               data-cy="task-cell-deadline-output">{deadline.toLocaleString()}</p>
                         </div>
                     )
-                }
-            </div>
+            }
         </div>
     );
 }

@@ -6,5 +6,6 @@ export const tasks = pgTable("tasks", {
     status: varchar("status", { length: 12 }).notNull(),
     timestamp: timestamp("timestamp").notNull().defaultNow(),
     deadline: timestamp("deadline"),
-    showDeadline: boolean("showDeadline").notNull(),
+    showDates: boolean("showDates").notNull(),
+    dateCompleted: timestamp("dateCompleted"),
 });

@@ -9,15 +9,15 @@ function App() {
     const filterRef = useRef("all");
     const [taskList, setTaskList] = useState([]);
     const [databaseTaskList, setDatabaseTaskList] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loadingSpinner, setLoadingSpinner] = useState(false);
     const [taskEditId, setTaskEditId] = useState(new Set());
 
     useEffect(() => {
-        fetchTasks(filterRef.current);
+        fetchTasks(filterRef.current, true);
     }, []);
 
-    async function fetchTasks(filter) {
-        setLoading(true);
+    async function fetchTasks(filter, loadingBoolean) {
+        setLoadingSpinner(loadingBoolean);
         const res = await fetch(`${constants.hostingUrl}/api/select/all/tasks`);
         const tasksArr = await res.json();
         tasksArr.sort((firstDate, secondDate) => {
@@ -39,15 +39,15 @@ function App() {
                         id={task.id}
                         deadline={task.deadline}
                         name={task.name}
-                        showDeadlineBoolean={task.showDeadline}
-                        setLoading={setLoading}
+                        showDatesBoolean={task.showDates}
+                        dateCompleted={task.dateCompleted}
                         setTaskEditId={setTaskEditId}
                         taskEditId={taskEditId}
                         key={task.id} />
             );
         }));
 
-        setLoading(false);
+        setLoadingSpinner(false);
     }
 
     return (
@@ -56,16 +56,15 @@ function App() {
                 <div>
                     <CreateNewTaskForm
                         fetchTasks={fetchTasks}
-                        filterRef={filterRef}
-                        setLoading={setLoading}/>
+                        filterRef={filterRef} />
                     <FilterTasksBtns
                         makeTaskList={makeTaskList}
                         filterRef={filterRef}
-                        databaseTaskList={databaseTaskList}/>
+                        databaseTaskList={databaseTaskList} />
                 </div>
             </div>
                 {
-                    loading
+                    loadingSpinner
                         ? (
                             <div className="is-flex
                                             is-justify-content-center
@@ -88,7 +87,6 @@ function App() {
                         )
                 }
         </div>
-
     );
 }
 

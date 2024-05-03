@@ -5,8 +5,9 @@ import ChangeTaskProgressBtn from "./ChangeTaskProgressBtn.jsx";
 import EditTaskForm from "./EditTaskForm.jsx";
 import ExitTaskBtn from "./ExitTaskBtn.jsx";
 import DeadlineOutput from "./DeadlineOutput.jsx";
-import ChangeDeadlineOutputBtn from "./ChangeDeadlineOutputBtn.jsx";
-import {useEffect, useState} from "react";
+import ChangeDatesOutputBtn from "./ChangeDatesOutputBtn.jsx";
+import { useState } from "react";
+import DateCompletedOutput from "./DateCompletedOutput.jsx";
 
 export default function Cell({
                                  fetchTasks,
@@ -16,34 +17,31 @@ export default function Cell({
                                  id,
                                  deadline,
                                  name,
-                                 showDeadlineBoolean,
-                                 setLoading,
+                                 showDatesBoolean,
+                                 dateCompleted,
                                  setTaskEditId,
                                  taskEditId
                                 }) {
-    const [currentTime, setCurrentTime] = useState(new Date());
-
-    useEffect(() => {
-        setTimeout(() => setCurrentTime(new Date()), 1000);
-    }, [currentTime]);
+    const [rerender, setRerender] = useState();
+    const isDateCompleted = new Date(dateCompleted);
     const changeValue = `${(status === constants.inProgress) ? constants.finished : constants.inProgress}?`;
     const deadlineDate = (deadline === null) ? deadline : new Date(deadline);
     if (filter !== "all" && status !== filter) {
         return null;
-
     }
 
-    console.log(taskEditId);
-
     return (
-        <div className="cell">
+        <div className="cell" data-cy="task-cell">
             <div>
                 {
-                    (taskEditId.has(id))
+                    taskEditId.has(id)
                         ? (
-                                <ExitTaskBtn whichExitFunc={setTaskEditId}
-                                             whichExitVal={taskEditId}
-                                             id={id} />
+                            <ExitTaskBtn
+                                whichExitFunc={setTaskEditId}
+                                whichExitVal={taskEditId}
+                                id={id}
+                                setRerender={setRerender}
+                                rerender={rerender} />
                         )
                         : (
                             <div className="is-flex
@@ -53,53 +51,68 @@ export default function Cell({
                                 <DeleteTaskBtn
                                     id={id}
                                     filterRef={filterRef}
-                                    fetchTasks={fetchTasks}
-                                    setLoading={setLoading} />
+                                    fetchTasks={fetchTasks} />
                                 <ChangeTaskProgressBtn
                                     id={id}
                                     status={status}
                                     filterRef={filterRef}
                                     fetchTasks={fetchTasks}
                                     value={changeValue}
-                                    showDeadlineBoolean={showDeadlineBoolean}/>
+                                    showDatesBoolean={showDatesBoolean}
+                                    dateCompleted={dateCompleted} />
                                 <EditTaskBtn
                                     id={id}
                                     taskEditId={taskEditId}
                                     setTaskEditId={setTaskEditId}
-                                    />
+                                    setRerender={setRerender}
+                                    rerender={rerender} />
                             </div>
                         )
                 }
             </div>
-            <div className="box m-0 py-2 is-flex is-flex-direction-column">
-                <div className="is-flex is-flex-direction-column is-justify-content-center is-align-items-center">
-                    <p className="has-text-primary">{name}</p>
-                    <p className="has-text-warning">{status}</p>
-                </div>
-                    {
-                        showDeadlineBoolean
-                        && (
-                            <div>
-                                <DeadlineOutput deadline={deadlineDate} currentTime={currentTime} />
-                            </div>
-                        )
-                    }
+            <div className="box m-0 py-4 is-flex is-flex-direction-column">
+                <div>
+                    <div className="is-flex is-flex-direction-column is-justify-content-center is-align-items-center">
+                        <p className="has-text-primary has-text-centered" data-cy="task-cell-name">{name}</p>
+                        <p className="has-text-warning">{status}</p>
+                        {
+                            (deadline && dateCompleted)
+                                ? (isDateCompleted.getTime() >= deadlineDate.getTime())
+                                    ? <p className="has-text-danger">Completed Late</p>
+                                    : <p className="has-text-success">Completed on time</p>
+                                : showDatesBoolean && <DeadlineOutput deadline={deadlineDate} />
+                        }
+                        {
+                            showDatesBoolean
+                            && dateCompleted
+                            && (
+                                <div
+                                    className="is-flex
+                                               is-flex-direction-column
+                                               is-justify-content-center
+                                               is-align-items-center">
+                                    <DateCompletedOutput isDateCompleted={isDateCompleted} deadline={deadline} />
+                                    <DeadlineOutput deadline={deadlineDate} />
+                                </div>
+                            )
+                        }
+                    </div>
                     {
                         (deadlineDate !== null && !taskEditId.has(id))
                         && (
                             <div>
-                                <ChangeDeadlineOutputBtn
+                                <ChangeDatesOutputBtn
                                     fetchTasks={fetchTasks}
-                                    showDeadlineBoolean={showDeadlineBoolean}
+                                    showDatesBoolean={showDatesBoolean}
                                     filterRef={filterRef}
                                     id={id} />
                             </div>
                         )
                     }
-            </div>
-            <div>
+                </div>
+                <div>
                     {
-                        (taskEditId.has(id))
+                        taskEditId.has(id)
                         && (
                             <div>
                                 <EditTaskForm
@@ -110,12 +123,11 @@ export default function Cell({
                                     setTaskEditId={setTaskEditId}
                                     taskEditId={taskEditId}
                                     deadline={deadline}
-                                    status={status}
-                                    setLoading={setLoading}
-                                    />
+                                    status={status} />
                             </div>
                         )
                     }
+                </div>
             </div>
         </div>
     );
